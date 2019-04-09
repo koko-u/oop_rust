@@ -9,9 +9,9 @@
 おことわり
 @snapend
 
-@snap[west fragment]
-- Javaを引き合いに説明する場合が多々あります|
-- ... |
+@snap[west]
+- Javaを引き合いに説明する場合が多々あります
+- ...
 @snapend
 
 ---
