@@ -5,7 +5,7 @@
 
 ---
 
-@snap[north-west] 
+@snap[north]
 おことわり
 @snapend
 
