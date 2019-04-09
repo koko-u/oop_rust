@@ -6,6 +6,7 @@ layout : center-left
 theme : moon
 theme-override : assets/css/PITCHME.css
 highlight : beige
+code-line-numbers : true
 
 # Behavior
 transition : slide
