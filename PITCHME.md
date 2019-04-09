@@ -119,3 +119,6 @@ fn main() {
     screen.run();
 }
 ```
+
+@[1-17](DrawトレイトとScreenを実装するひととは別にButton, SelectBox を作成している)
+@[18-27](components に Box<dyn Draw>を格納)
