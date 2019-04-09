@@ -121,4 +121,4 @@ fn main() {
 ```
 
 @[1-16](Drawトレイトと独立してButton, SelectBox を作成する)
-@[17-27](components に Box\<dyn Draw\>を格納)
+@[17-27](components に Box&lt;dyn Draw&gt;を格納)
