@@ -9,12 +9,12 @@
 おことわり
 @snapend
 
-@snap[west]
-- Javaを引き合いに説明する場合が多々あります|
-@snapend
-@snap[west]
-- ...|
-@snapend
+- @snap[west]
+   Javaを引き合いに説明する場合が多々あります
+  @snapend |
+- @snap[west]
+  ...
+  @snapend |
 
 ---
 # もくじ
