@@ -78,9 +78,44 @@ Rust にはない。
 われわれが継承で欲しかったのは、コードの共有ではなく、ポリモーフィズムだったのだ
 
 +++
-### ポリモーフィズム
 
-@snap[south span-100]
 @quote[ポリモーフィズム（英: Polymorphism）とは、プログラミング言語の型システムの性質を表すもので、プログラミング言語の各要素（定数、変数、式、オブジェクト、関数、メソッドなど）についてそれらが複数の型に属することを許すという性質を指す。](Wikipediaより)
-@snapend
 
+---
+### 例
+
+第8章で、複数のタイプ（整数、浮動小数点数、文字列）を含む`Vec`を考えた。
+
+複数のタイプが事前にいくつあるかわからない場合がある。
+ここでは例として、`Draw`トレイトを実装する任意の型を格納できるような`Vec`がほしいとする。
+
+---
+### 利用側のコード
+
+```rust
+pub struct Button {
+    pub width: u32,
+    pub height: u32,
+    pub label: String,
+}
+impl Draw for Button {
+    fn draw(&self) {
+        // ...
+    }
+}
+pub struct SelectBox {
+    // ...
+}
+impl Draw for SelectBox {
+    // ...
+}
+fn main() {
+    let screen = Screen {
+        components: vec![
+            Box::new(SelectBox { ... })
+            Box::new(Button { ... })
+        ]
+    };
+    screen.run();
+}
+```
