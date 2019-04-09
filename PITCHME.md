@@ -5,12 +5,14 @@
 
 ---
 
-@snap[north]
+@snap[north-west]
 おことわり
 @snapend
 
+@snap[west]
 - Javaを引き合いに説明する場合が多々あります|
 - ...|
+@snapend
 
 ---
 # もくじ
