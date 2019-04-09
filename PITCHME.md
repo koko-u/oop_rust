@@ -4,7 +4,10 @@
 @size[smaller](Rust のオブジェクト指向的な機能)
 
 ---
-@snap[north-west] おことわり @snapend
+
+@snap[north-west] 
+おことわり
+@snapend
 
 - Javaを引き合いに説明する場合が多々あります|
 - ...|
