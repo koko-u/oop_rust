@@ -3,7 +3,7 @@ layout : center-left
 
 # Look-and-Feel
 #logo : assets/images/logo.png
-theme : beige
+theme : moon
 theme-override : assets/css/PITCHME.css
 highlight : moon
 
