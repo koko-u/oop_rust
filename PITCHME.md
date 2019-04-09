@@ -45,7 +45,7 @@ Rust では `struct` または `enum` がオブジェクトに相当する。
 
 オブジェクト指向的には、データとその振る舞いを一つにまとめて「オブジェクト」と呼ぶ
 
-@snap[north]
+@snap[south]
 @box[text-gray](オブジェクト指向的な意味で「オブジェクト」という用語はあまり使われない？後述のトレイトオブジェクトでのみ「オブジェクト」の用語が使われる)
 @snapend
 
@@ -56,7 +56,7 @@ Rust では `struct` または `enum` がオブジェクトに相当する。
 
 Rust では公開（`pub`）かそうでないかをアイテムに指定することで、この機能を実現している
 
-@snap[north]
+@snap[south]
 @box[text-gray](`pub(crate)`とか`pub(self)`についてはわからん)
 @snapend
 
