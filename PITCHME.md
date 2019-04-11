@@ -68,37 +68,67 @@ impl ブロックで、構造体や列挙体に振るまいを追加している
 
 ---
 
-- @css[text-gray](オブジェクト指向とは)
-- @css[text-white](トレイトオブジェクト)
-- @css[text-gray](オブジェクト指向的実装例)
+1. @css[text-gray](オブジェクト指向とは)
+2. @css[text-white](トレイトオブジェクト)
+3. @css[text-gray](オブジェクト指向的実装例)
 
 ---
 ## トレイトオブジェクト
 
 #### 動機
 
-われわれが継承で欲しかったのは、コードの共有ではなく、ポリモーフィズムだったのだ
+われわれが継承で欲しかったのは、コードの共有ではなく、ポリモーフィズムだ。
+
+- 継承によるコードの共有は密結合を招いて、歓迎されない|
+- インターフェースを切り出して、疎結合を実現したい|
 
 +++
 
 @quote[ポリモーフィズム（英: Polymorphism）とは、プログラミング言語の型システムの性質を表すもので、プログラミング言語の各要素（定数、変数、式、オブジェクト、関数、メソッドなど）についてそれらが複数の型に属することを許すという性質を指す。](Wikipediaより)
 
 ---
-### 例
+### トレイトオブジェクトとは
 
-第8章で、複数のタイプ（整数、浮動小数点数、文字列）を含む`Vec`を考えた。
+`Draw`トレイトに対して、`&dyn Draw` または `Box<dyn Draw>`をトレイトオブジェクトを呼ぶ。
 
-複数のタイプが事前にいくつあるかわからない場合がある。
-ここでは例として、`Draw`トレイトを実装する任意の型を格納できるような`Vec`がほしいとする。
+これらはポインタで、そのアドレスの指す先は`Draw`トレイトを実装する任意の型(`struct`, `enum`)となる。
+
+ポインタの指す先が任意の型でありうるので、`str`と同様に`dyn Draw`は直接型として指定することはできない。
 
 ---
-### 利用側のコード
+### 例（Draw提供側）
+
+```rust
+pub trait Draw {
+    fn draw(&self);
+}
+pub struct Screen {
+    pub components: Vec<Box<dyn Draw>>
+}
+impl Screen {
+    pub fn run(&self) {
+        for component in self.components.iter() {
+            component.draw();
+        }
+    }
+}
+```
+@[1-3](普通のトレイトの定義)
+@[4-6](`Box<dyn Drow>`を要素にもつベクトルをもつ構造体)
+@[7-12](`Draw`を実装している型が何であっても動作する)
+
+---
+### C++ とほとんど同じ
+
+- `Draw` は抽象メソッド`draw`を持つクラス 
+- 任意の `Draw` のサブタイプを格納する `vector` を作るために `vector<unique_ptr<Draw>>`を用意する
+
+---
+### 例（Draw利用側）
 
 ```rust
 pub struct Button {
-    pub width: u32,
-    pub height: u32,
-    pub label: String,
+    // ...
 }
 impl Draw for Button {
     fn draw(&self) {
@@ -122,5 +152,40 @@ fn main() {
 }
 ```
 
-@[1-16](Drawトレイトと独立してButton, SelectBox を作成する)
-@[17-27](components に Box&lt;dyn Draw&gt;を格納)
+@[1-14](利用側が任意に`Draw`を実装する)
+@[15-23](実際の型からトレイトオブジェクトを作成する)
+
+---
+### ジェネリックスとの違い（１）
+
+先の`Screen`をジェネリックスを用いて定義したとする
+
+```rust
+pub struct Screen<T: Draw> {
+    pub components: Vec<T>
+}
+impl<T> Screen<T> where T: Draw {
+    pub fn run(&self) {
+        for component in self.components.iter() {
+            component.draw();
+        }
+    }
+}
+```
+
+--- ジェネリックスとの違い（２）
+
+クライアントが困る
+
+```rust
+fn main() {
+    let screen = Screen {
+        components: vec![
+            SelectBox { ... }
+            Button { ... }
+        ]
+    };
+    screen.run();
+}
+```
+@[4-5](ことなる型を同時に格納できない)
