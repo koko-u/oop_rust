@@ -5,7 +5,7 @@ layout : center-left
 #logo : assets/images/logo.png
 theme : moon
 theme-override : assets/css/PITCHME.css
-highlight : docco
+highlight : vs
 code-line-numbers : true
 
 # Behavior
