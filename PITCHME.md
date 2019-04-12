@@ -62,8 +62,8 @@ impl ブロックで、構造体や列挙体に振るまいを追加している
 +++
 ### Rust は継承の機能をもっているか？
 
-@snap[midpoint fragment]
-@css[larger]ない
+@snap[south fragment]
+@size[1.8em](ありません)
 @snapend
 
 ---
@@ -251,3 +251,139 @@ protected Object clone() { /* ... */ }
 - コンテキストは内部状態（ステート）を持つ
 - 状態はステートクラスのサブタイプである
 - 状態に応じた振る舞いをサブタイプが実装する
+
+---
+
+### 写経してハマった所(ザ・素人)
+
+1. `Post`構造体が、トレイトオブジェクトを`Option`型で包んでいる
+2. `approve`メソッド等の引数が`self`では動かない
+3. `State`トレイトが`approve`メソッド等に対してデフォルトの実装を持てない
+
+---
+
+#### 素人（１）
+
+`Post`の`state`が`Option`に包まれている
+
+```rust
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
+```
+@[2](直接Box&lt;dyn State&gt;ではだめなのか？)
+
++++
+#### Option::take のちから
+
+次のように定義したとすると
+
+```rust
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
+```
+
+`approve`などは次のような実装をしてしまう（私はした）
+
+```rust
+pub fn approve(&mut self) {
+    self.state = self.state.approve();
+}
+```
+
++++
+#### Option::take のちから
+
+![Compile Error](assets/images/compile_error02.png)
+
+`Post`が所有している`state`を一瞬足りとも`move`することはできない！
+
+その分、`content`の実装が面倒くさくなっている
+
++++
+#### Option::take のちから
+
+```rust
+pub fn approve(&mut self) {
+    if let Some(state) = self.state.take() {
+        self.state = Some(state.approve());
+    }
+}
+```
+@[2](Postが保持しているstateを取り出して、代わりにNoneで埋める)
+@[3](取り出したstateから次の状態を求めて、穴埋めする)
+
++++
+#### Option::take のちから
+
+その代わり`content`の実装が回りくどくなっている
+
+```rust
+pub fn content(&self) -> &str {
+    self.state.as_ref().unwrap().content(&self)
+}
+```
+
+---
+#### 素人（２）
+
+`approve`メソッド等の引数が`self: Box<Self>`になっている理由がわからない
+
+```rust
+pub trait State {
+    fn approve(self: Box<Self>) -> Box<dyn State>;
+    //...
+}
+```
+
++++
+#### `self`引数に渡されるのは Box<dyn State>ではない
+
+試しに、`fn approve(self) -> Box<dyn State>`と宣言を変えてみる。
+
+![Compile Error](assets/images/compile_error03.png)
+
+ステータスを変化させない実装で問題が起こっている
+
++++
+#### approve に Box<dyn State> をそのまま move したい
+
+`Post`側の`approve`から`State`の`approve`は次のように呼ばれている
+
+```rust
+pub fn approve(&mut self) {
+    if let Some(state) = self.state.take() {
+        self.state = Some(state.approve());
+    }
+}
+```
+@[2](ここで得られる state は`Option`を剥がされた `Box<dyn State>`)
+@[3](この approve の引数が self だと、自動的にBoxが指す先がselfに渡る)
+
+---
+#### 素人（３）
+
+`approve`メソッドはだいたい`self`を返すので、デフォルトの実装としたい
+
+```rust
+pub trait State {
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+    //...
+}
+```
+
++++
+#### コンパイルエラー
+
+![Compile Error](assets/images/compile_error04.png)
+
+@snap[south fragment]
+@size[1.8em](わかりません)
+@snapend
+
+
