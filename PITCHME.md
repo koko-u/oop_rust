@@ -37,7 +37,7 @@
 - 継承
   - オブジェクトから振る舞いを引き継げる|
 
-+++
+---
 ### Rust はオブジェクトの機能を持っているか？
 
 `struct` や `enum` がある。
@@ -48,7 +48,7 @@ impl ブロックで、構造体や列挙体に振るまいを追加している
 @box[text-gray](後述のトレイトオブジェクトと紛らわしいので「オブジェクト」という用語はあまり使われない？)
 @snapend
 
-+++
+---
 ### Rust はカプセル化の機能を持っているか？
 
 `pub` がある。
@@ -59,7 +59,7 @@ impl ブロックで、構造体や列挙体に振るまいを追加している
 @box[text-gray](`pub(crate)`とか`pub(self)`についてはわからん)
 @snapend
 
-+++
+---
 ### Rust は継承の機能をもっているか？
 
 @snap[south fragment]
@@ -169,7 +169,7 @@ impl<T> Screen<T> where T: Draw {
 }
 ```
 
-+++
+---
 ### ジェネリックスとの違い（２）
 
 クライアントが困る
@@ -197,7 +197,7 @@ fn main() {
 - 戻り値が Self でない|
 - ジェネリックパラメータを持たない|
 
-+++
+---
 #### 戻り値が`Self`でない
 
 トレイトオブジェクトは「具体的な型を気にする必要がない」という機能であった。
@@ -205,7 +205,7 @@ fn main() {
 一方で、`Self`が戻り値として含まれる関数は、具体的な型が明らかになる必要があるため、
 トレイトオブジェクトとして適していない。
 
-+++
+---
 #### ジェネリックパラメータを持たない
 
 同じく、ジェネリックパラメータをもつ関数も型パラメータを与えることができず、
@@ -214,7 +214,7 @@ fn main() {
 ただし、トレイトの関連型(Associated Type)は、トレイトオブジェクトを
 `&dyn Draw<Item=i32>`のように指定することで、関連型ごとにトレイトオブジェクトを作成できる。
 
-+++
+---
 #### オブジェクト安全でない例
 
 `Clone`トレイトを考えると、これは`Self`を戻り値としており、オブジェクト安全ではない
@@ -262,7 +262,7 @@ protected Object clone() { /* ... */ }
 
 ---
 
-#### 素人（１）
+#### Option<Box<dyn Draw>>
 
 `Post`の`state`が`Option`に包まれている
 
@@ -274,8 +274,8 @@ pub struct Post {
 ```
 @[2](直接Box&lt;dyn State&gt;ではだめなのか？)
 
-+++
-#### Option::take のちから
+---
+#### 間違った定義
 
 次のように定義したとすると
 
@@ -294,17 +294,15 @@ pub fn approve(&mut self) {
 }
 ```
 
-+++
-#### Option::take のちから
+---
+#### コンパイルエラー
 
 ![Compile Error](assets/images/compile_error02.png)
 
 `Post`が所有している`state`を一瞬足りとも`move`することはできない！
 
-その分、`content`の実装が面倒くさくなっている
-
-+++
-#### Option::take のちから
+---
+#### Option::take のチカラ
 
 ```rust
 pub fn approve(&mut self) {
@@ -316,8 +314,8 @@ pub fn approve(&mut self) {
 @[2](Postが保持しているstateを取り出して、代わりにNoneで埋める)
 @[3](取り出したstateから次の状態を求めて、穴埋めする)
 
-+++
-#### Option::take のちから
+---
+#### Optionは面倒くさい
 
 その代わり`content`の実装が回りくどくなっている
 
@@ -329,7 +327,7 @@ pub fn content(&self) -> &str {
 @[2](借用しているOption<Box<dyn State>>からBox<dyn State>を借用しなおしてから、State の contentを呼ぶ)
 
 ---
-#### 素人（２）
+#### メソッドの引数問題
 
 `approve`メソッド等の引数が`self: Box<Self>`になっている理由がわからない
 
@@ -340,7 +338,7 @@ pub trait State {
 }
 ```
 
-+++
+---
 #### `self`引数に渡されるのは Box<dyn State>ではない
 
 試しに、`fn approve(self) -> Box<dyn State>`と宣言を変えてみる。
@@ -349,7 +347,7 @@ pub trait State {
 
 ステータスを変化させない実装で問題が起こっている
 
-+++
+---
 #### approve に Box<dyn State> をそのまま move したい
 
 `Post`側の`approve`から`State`の`approve`は次のように呼ばれている
@@ -365,7 +363,7 @@ pub fn approve(&mut self) {
 @[3](この approve の引数が self だと、自動的にBoxが指す先がselfに渡る)
 
 ---
-#### 素人（３）
+#### コードの重複を除きたい
 
 `approve`メソッドはだいたい`self`を返すので、デフォルトの実装としたい
 
@@ -378,13 +376,21 @@ pub trait State {
 }
 ```
 
-+++
+---
 #### コンパイルエラー
 
 ![Compile Error](assets/images/compile_error04.png)
 
 @snap[south fragment]
-@size[1.8em](わかりません)
+@size[1.8em](わかりません
+)
+@snapend
+
+---
+#### わかりません
+
+@snap[midpoint span-100]
+@quote[This would violate object safety, because the trait doesn't know what the concreate `self` will be exactly.]
 @snapend
 
 ---
@@ -394,8 +400,8 @@ pub trait State {
   - 状態同士が密結合になっている|
   - 結果的に状態を追加する場合にその状態遷移が容易でない|
 - コードの重複
-  - `State`のデフォルト実装が難しい|
-  - `Post`のメソッドを`State`に委譲するコードが重複している|
+  - Stateのデフォルト実装が難しい|
+  - PostのメソッドをStateに委譲するコードが重複している|
 
 ---
 ### 状態を型として表現する別の戦略
@@ -412,7 +418,7 @@ fn main() {
 @[2](Post::new で実際には DraftPost が返される)
 @[3](DraftPost には add_text メソッドが定義されている)
 
-+++
+---
 #### 状態を提供する側
 
 ```rust
@@ -438,7 +444,7 @@ impl DraftPost {
 @[11](Post は内容を公開しているが、書き込むことはできない)
 @[14](DraftPost の状態でのみ add_text できる)
 
-+++
+---
 #### 状態の遷移
 
 ```rust
@@ -462,5 +468,5 @@ impl PendingReviewPost {
 ## 結論
 
 - Rust はある意味でオブジェクト指向言語である
-- トレイトオブジェクトによって動的なディスパッチが可能
+- トレイトオブジェクトによる動的なディスパッチが可能
 - オブジェクト指向的な設計だけが選択肢ではない
