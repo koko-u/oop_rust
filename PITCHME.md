@@ -326,6 +326,7 @@ pub fn content(&self) -> &str {
     self.state.as_ref().unwrap().content(&self)
 }
 ```
+@[2](借用しているOption<Box<dyn State>>からBox<dyn State>を借用しなおしてから、State の contentを呼ぶ)
 
 ---
 #### 素人（２）
