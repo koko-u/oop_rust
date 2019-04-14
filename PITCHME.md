@@ -116,7 +116,7 @@ impl Screen {
 ---
 ### C++ とほとんど同じ
 
-- `Draw` は抽象メソッド`draw`を持つクラス 
+- `Draw` は抽象メソッド`draw`を持つクラス
 - 任意の `Draw` のサブタイプを格納する `vector` を作るために `vector<unique_ptr<Draw>>`を用意する
 
 ---
@@ -281,7 +281,7 @@ pub struct Post {
 
 ```rust
 pub struct Post {
-    state: Option<Box<dyn State>>,
+    state: Box<dyn State>,
     content: String,
 }
 ```
