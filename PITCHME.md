@@ -387,4 +387,80 @@ pub trait State {
 @size[1.8em](わかりません)
 @snapend
 
+---
+### トレイトオブジェクトによる実装の欠点
 
+- 状態の遷移を各状態が知っている
+  - 状態同士が密結合になっている|
+  - 結果的に状態を追加する場合にその状態遷移が容易でない|
+- コードの重複
+  - `State`のデフォルト実装が難しい|
+  - `Post`のメソッドを`State`に委譲するコードが重複している|
+
+---
+### 状態を型として表現する別の戦略
+
+トレイトオブジェクトとして”統一的に”扱うのをやめて、完全に独立した型とする
+
+```rust
+fn main() {
+    let mut post = Post::new();
+    post.add_text("I ate a salad for lunch today");
+    //...
+}
+```
+@[2](Post::new で実際には DraftPost が返される)
+@[3](DraftPost には add_text メソッドが定義されている)
+
++++
+#### 状態を提供する側
+
+```rust
+pub struct Post {
+    content: String,
+}
+pub struct DraftPost {
+    content: String,
+}
+impl Post {
+    pub fn new() -> DraftPost {
+        DraftPost { content: String::new() }
+    }
+    pub fn content(&self) -> &str { &self.content }
+}
+impl DraftPost {
+    pub fn add_text(&mut self, text: &str) {
+        self.content.push_str(text);
+    }
+}
+```
+@[8](Post::new も普通の関数なので DraftPost を返却できる)
+@[11](Post は内容を公開しているが、書き込むことはできない)
+@[14](DraftPost の状態でのみ add_text できる)
+
++++
+#### 状態の遷移
+
+```rust
+impl DraftPost {
+    //...
+    pub fn request_review(self) -> PendingReviewPost {
+        PendingReviewPost { content: self.content }
+    }
+}
+impl PendingReviewPost {
+    pub fn approve(self) -> Post {
+        Post { content: self.content }
+    }
+}
+```
+@[3](DraftPost -> PendingReviewPost と状態が変わり)
+@[8](PendingReviewPost -> Post と状態が変わる)
+@[8](承認されることで、Post 構造体に戻って、内容を公開できる)
+
+---
+## 結論
+
+- Rust はある意味でオブジェクト指向言語である
+- トレイトオブジェクトによって動的なディスパッチが可能
+- オブジェクト指向的な設計だけが選択肢ではない
