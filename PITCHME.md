@@ -104,9 +104,26 @@ Rustには継承はない。
 ---
 ### トレイトオブジェクトとは
 
-`Draw`トレイトに対して、`&dyn Draw` または `Box<dyn Draw>`をトレイトオブジェクトと呼ぶ。
+<table>
+    <tr>
+        <th>トレイト<th>
+        <td>Draw</td>
+    </tr>
+    <tr>
+        <th>トレイトオブジェクト(1)</th>
+        <td>&dyn Draw</td>
+    </tr>
+    <tr>
+        <th>トレイトオブジェクト(2)</th>
+        <td>Box&lt;dyn Draw&gt;</td>
+    </tr>
+</table>
 
-これらはポインタで、そのアドレスの指す先は`Draw`トレイトを実装する任意の型(`struct`, `enum`)となる。
++++
+
+`Draw`を実装するあらゆる型`T`に対して、`&T` は`&dyn Draw`に合致し、`Box<T>`は`Box<dyn Draw>`と合致する。
+
+大まかに、`T`型のオブジェクトを指すアドレスと、`T`型が実装している`Draw`のメソッドの一覧（= vtable）を `&dyn Draw`型の変数は保持している。
 
 ---
 ### 例（Draw提供側）
