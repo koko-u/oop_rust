@@ -8,7 +8,7 @@
 <hr/>
 
 - オブジェクト指向については知っているものとします
-- ...
+- オブジェクト指向の良し悪しについては言及しません
 
 ---
 ## もくじ
@@ -44,27 +44,40 @@
 
 impl ブロックで、構造体や列挙体に振るまいを追加している、とみなすことができる。
 
-@snap[south span-100 fragment]
-@box[text-gray](後述のトレイトオブジェクトと紛らわしいので「オブジェクト」という用語はあまり使われない？)
-@snapend
-
----
+ ---
 ### Rust はカプセル化の機能を持っているか？
 
 `pub` がある。
 
 アイテム（モジュール、構造体、関数 など）に対して、公開・非公開を選択することで、APIとして必要な機能を外部に公開することができる。
 
-@snap[south span-100 fragment]
-@box[text-gray](`pub(crate)`とか`pub(self)`についてはわからん)
-@snapend
-
 ---
 ### Rust は継承の機能をもっているか？
 
-@snap[south fragment]
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+@snap[midpoint fragment]
 @size[1.8em](ありません)
 @snapend
+
+---
+### 結論
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+@snap[midpoint fragment]
+@size[1.8em](２勝１敗でRustはオブジェクト指向言語である)
+@snapend
+
++++
+
+だから何か”よい”ということではありません
 
 ---
 
