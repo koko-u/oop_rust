@@ -102,7 +102,7 @@ Rustには継承はない。
 
 <table>
     <tr>
-        <th>トレイト<th>
+        <th>トレイト</th>
         <td>Draw</td>
     </tr>
     <tr>

@@ -3,13 +3,16 @@ table {
     margin:0 auto;
 }
 td,th {
-    border:1px solid #ccc;
+    border:1px solid black;
     padding:10px;
 }
 th {
-    background:#EFEFEF;
+    background:#f8f8ff;
+    color: darkslategray;
     text-align: center;
 }
 td {
+    background: white;
+    color: black;
     text-align: left;
 }
