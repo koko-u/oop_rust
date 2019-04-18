@@ -375,7 +375,7 @@ pub fn content(&self) -> &str {
 ---
 #### メソッドの引数問題
 
-`approve`メソッド等の引数が`self: Box<Self>`になっている理由がわからない
+`approve` メソッド等の引数が `self:Box<Self>` になっている理由がわからない
 
 ```rust
 pub trait State {
@@ -385,7 +385,7 @@ pub trait State {
 ```
 
 ---
-#### `self`引数に渡されるのは Box<dyn State>ではない
+#### `self`引数に渡されるのは Box&lt;dyn State&gt;ではない
 
 試しに、`fn approve(self) -> Box<dyn State>`と宣言を変えてみる。
 
@@ -394,9 +394,9 @@ pub trait State {
 ステータスを変化させない実装で問題が起こっている
 
 ---
-#### approve に Box<dyn State> をそのまま move したい
+#### approve に Box&lt;dyn State&gt; をそのまま move したい
 
-`Post`側の`approve`から`State`の`approve`は次のように呼ばれている
+`Post` 側の `approve` から `State` の `approve` は次のように呼ばれている
 
 ```rust
 pub fn approve(&mut self) {
@@ -409,9 +409,31 @@ pub fn approve(&mut self) {
 @[3](この approve の引数が self だと、自動的にBoxが指す先がselfに渡る)
 
 ---
+#### 引数の指定による解決
+
+```rust
+pub trait State {
+    fn approve(self: Box<Self>) -> Box<dyn State>;
+    //...
+}
+```
+
+こうすると
+
+```rust
+pub fn approve(&mut self) {
+    if let Some(state) = self.state.take() {
+        self.state = Some(state.approve());
+    }
+}
+```
+
+ここで `approve` に `Box<Draft>` をそのまま渡せる。
+
+---
 #### コードの重複を除きたい
 
-`approve`メソッドはだいたい`self`を返すので、デフォルトの実装としたい
+`approve` メソッドはほとんどの場合 `self` を返すので、デフォルトの実装としたい
 
 ```rust
 pub trait State {
@@ -427,27 +449,25 @@ pub trait State {
 
 ![Compile Error](assets/images/compile_error04.png)
 
-@snap[south fragment]
-@size[1.8em](わかりません
-)
+@snap[midpoint text-20 text-gold fragment]
+わかりません
 @snapend
 
 ---
 #### わかりません
+<hr/>
 
-@snap[midpoint span-100]
 @quote[This would violate object safety, because the trait doesn't know what the concreate `self` will be exactly.]
-@snapend
 
 ---
 ### トレイトオブジェクトによる実装の欠点
 
-- 状態の遷移を各状態が知っている
+- 状態の遷移を各状態が知っている|
   - 状態同士が密結合になっている|
-  - 結果的に状態を追加する場合にその状態遷移が容易でない|
-- コードの重複
+  - 状態を追加する場合にその状態遷移が容易でない|
+- コードの重複|
   - Stateのデフォルト実装が難しい|
-  - PostのメソッドをStateに委譲するコードが重複している|
+  - PostのメソッドをStateに委譲するコードの重複|
 
 ---
 ### 状態を型として表現する別の戦略
@@ -486,16 +506,15 @@ impl DraftPost {
     }
 }
 ```
-@[8](Post::new も普通の関数なので DraftPost を返却できる)
-@[11](Post は内容を公開しているが、書き込むことはできない)
-@[14](DraftPost の状態でのみ add_text できる)
+@[7-8](Post::new も普通の関数なので DraftPost を返却できる)
+@[11](Post は内容を公開しているが、書き込みはない)
+@[13-14](書き込みは DraftPost にある)
 
 ---
 #### 状態の遷移
 
 ```rust
 impl DraftPost {
-    //...
     pub fn request_review(self) -> PendingReviewPost {
         PendingReviewPost { content: self.content }
     }
@@ -506,13 +525,20 @@ impl PendingReviewPost {
     }
 }
 ```
-@[3](DraftPost -> PendingReviewPost と状態が変わり)
-@[8](PendingReviewPost -> Post と状態が変わる)
-@[8](承認されることで、Post 構造体に戻って、内容を公開できる)
+@[1-2](DraftPost -> PendingReviewPost と型自体が変わる)
+@[6-7](PendingReviewPost -> Post と型自体が変わる)
+@[1-10](承認されることで、Post 構造体に戻る。つまり公開できる)
+
+---
+#### 所感
+
+- 無駄なメソッドの実装は減っている
+- Content と State を分離する、というステートパターンの思想は失われている
+- 状態の遷移が見通し良くなったかと言うと、そうでもない
 
 ---
 ## 結論
 
 - Rust はある意味でオブジェクト指向言語である
-- トレイトオブジェクトによる動的なディスパッチが可能
+- トレイトオブジェクトの機能により、動的にメソッドの実行を切り替えることができる
 - オブジェクト指向的な設計だけが選択肢ではない
