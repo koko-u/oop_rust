@@ -370,7 +370,7 @@ pub fn content(&self) -> &str {
     self.state.as_ref().unwrap().content(&self)
 }
 ```
-@[2](借用しているOption<Box<dyn State>>からBox<dyn State>を借用しなおしてから、State の contentを呼ぶ)
+@[2](借用しているOption&lt;Box&lt;dyn State&gt;&gt;からBox&lt;dyn State&gt;を借用しなおしてから、State の contentを呼ぶ)
 
 ---
 #### メソッドの引数問題
