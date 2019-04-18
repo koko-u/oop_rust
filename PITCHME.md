@@ -117,9 +117,9 @@ Rustには継承はない。
 
 +++
 
-`Draw`を実装するあらゆる型`T`に対して、`&T` は`&dyn Draw`に合致し、`Box<T>`は`Box<dyn Draw>`と合致する。
+`Draw` を実装するあらゆる型 `T` に対して、`&T` は `&dyn Draw` に合致し、`Box<T>` は `Box<dyn Draw>` と合致する。
 
-大まかに、`T`型のオブジェクトを指すアドレスと、`T`型が実装している`Draw`のメソッドの一覧（= vtable）を `&dyn Draw`型の変数は保持している。
+大まかに、`&dyn Draw` はファット・ポインタとなっており、`T` 型の値を指すアドレスと、`T` 型が実装している `Draw` のメソッドの一覧（= vtable）を保持している。
 
 ---
 ### 例（Draw提供側）
@@ -445,7 +445,7 @@ pub trait State {
 
 ![Compile Error](assets/images/compile_error04.png)
 
-@snap[midpoint text-20 text-gold fragment]
+@snap[midpoint text-20 text-white fragment]
 わかりません
 @snapend
 
