@@ -54,10 +54,9 @@ impl ブロックで、構造体や列挙体に振るまいを追加している
 ---
 ### Rust は継承の機能をもっているか？
 
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
+　
+　
+　
 
 @snap[midpoint fragment]
 @size[1.8em](ありません)
@@ -66,13 +65,12 @@ impl ブロックで、構造体や列挙体に振るまいを追加している
 ---
 ### 結論
 
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
+　
+　
+　
 
 @snap[midpoint fragment]
-@size[1.8em](２勝１敗でRustはオブジェクト指向言語である)
+２勝１敗でRustはオブジェクト指向言語である
 @snapend
 
 +++
