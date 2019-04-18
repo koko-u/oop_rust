@@ -290,20 +290,24 @@ interface Clonable {}
 ![State Pattern](assets/images/state_pattern.png)
 
 - コンテキストは内部状態（ステート）を持つ
-- 状態はステートクラスのサブタイプである
+- 状態はステートインターフェースのサブタイプ
 - 状態に応じた振る舞いをサブタイプが実装する
 
 ---
 
-### 写経してハマった所(ザ・素人)
+### 写経してハマった所（ザ・素人）
 
 1. `Post`構造体が、トレイトオブジェクトを`Option`型で包んでいる
 2. `approve`メソッド等の引数が`self`では動かない
 3. `State`トレイトが`approve`メソッド等に対してデフォルトの実装を持てない
 
+@snap[fragment]
+@css[text-gray](すべて答えが書いてあった)
+@snapend
+
 ---
 
-#### Option<Box<dyn Draw>>
+#### Option&lt;Box&lt;dyn Draw&gt;&gt;
 
 `Post`の`state`が`Option`に包まれている
 
@@ -314,6 +318,7 @@ pub struct Post {
 }
 ```
 @[2](直接Box&lt;dyn State&gt;ではだめなのか？)
+@[1-4](ステートを保持しないPostは存在しないのでは？)
 
 ---
 #### 間違った定義
@@ -327,7 +332,7 @@ pub struct Post {
 }
 ```
 
-`approve`などは次のような実装をしてしまう（私はした）
+`approve`などは次のような実装（を私はした）
 
 ```rust
 pub fn approve(&mut self) {
