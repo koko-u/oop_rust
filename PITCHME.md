@@ -450,7 +450,7 @@ pub trait State {
 @snapend
 
 ---
-#### わかりません
+### わかりません
 <hr/>
 
 @quote[This would violate object safety, because the trait doesn't know what the concreate `self` will be exactly.]
