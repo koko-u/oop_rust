@@ -432,30 +432,6 @@ pub fn approve(&mut self) {
 `state: Box<dyn State>` に対して `state.approve()` が参照外しをすることなくそのまま渡せる。
 
 ---
-#### 悪あがき
-
-```rust
-impl State for Draft {
-    fn approve(self) -> Box<dyn State> {
-        Box::new(self)
-    }
-    //...
-}
-```
-
-これではイカンのか？
-
-`self` に `Draft` のような具体的な型の値がわたって来るなら、もう一度 `Box::new` で包んだらええんやろ！
-
----
-#### 浅はか！
-
-![Compile Error](assets/images/compile_error05.png)
-
-呼び出し側で `approve` に渡されるときの型は `Box<dyn State>` を deref された `dyn State` である、と判断され、これはサイズ未定でコンパイルできない。
-
-
----
 #### コードの重複を除きたい
 
 `approve` メソッドはほとんどの場合 `self` を返すので、デフォルトの実装としたい
