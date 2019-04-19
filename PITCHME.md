@@ -293,21 +293,21 @@ interface Clonable {}
 
 ---
 
-### 写経してハマった所（ザ・素人）
+### 写経してハマった所（本文読んでないから）
 
-1. `Post`構造体が、トレイトオブジェクトを`Option`型で包んでいる
-2. `approve`メソッド等の引数が`self`では動かない
-3. `State`トレイトが`approve`メソッド等に対してデフォルトの実装を持てない
+1. `Post` 構造体が、トレイトオブジェクトを `Option` 型で包んでいる
+2. `approve` メソッド等の引数が `self` では動かない
+3. `State` トレイトが `approve` メソッド等に対してデフォルトの実装を持てない
 
 @snap[fragment]
-@css[text-gray](すべて答えが書いてあった)
+@css[text-gray](すべて本文に答えが書いてある)
 @snapend
 
 ---
 
 #### Option&lt;Box&lt;dyn Draw&gt;&gt;
 
-`Post`の`state`が`Option`に包まれている
+`Post` の `state` が `Option` に包まれている
 
 ```rust
 pub struct Post {
@@ -315,7 +315,7 @@ pub struct Post {
     content: String,
 }
 ```
-@[2](直接Box&lt;dyn State&gt;ではだめなのか？)
+@[2](直接 Box&lt;dyn State&gt; ではだめなのか？)
 @[1-4](ステートを保持しないPostは存在しないのでは？)
 
 ---
@@ -330,7 +330,7 @@ pub struct Post {
 }
 ```
 
-`approve`などは次のような実装（を私はした）
+`approve` などは次のような実装（を私はした）
 
 ```rust
 pub fn approve(&mut self) {
@@ -343,7 +343,9 @@ pub fn approve(&mut self) {
 
 ![Compile Error](assets/images/compile_error02.png)
 
-`Post`が所有している`state`を一瞬足りとも`move`することはできない！
+`Post` が所有している `state` を一瞬足りとも `move` することはできない！
+
+@size[smaller](画像のメソッドがあっていないが、差し替える余力がなかった...)
 
 ---
 #### Option::take のチカラ
@@ -355,20 +357,20 @@ pub fn approve(&mut self) {
     }
 }
 ```
-@[2](Postが保持しているstateを取り出して、代わりにNoneで埋める)
-@[3](取り出したstateから次の状態を求めて、穴埋めする)
+@[2](Post が保持している state を取り出して、代わりに None で埋める)
+@[3](取り出した state から次の状態を求めて、穴埋めする)
 
 ---
 #### Optionは面倒くさい
 
-その代わり`content`の実装が回りくどくなっている
+その代わり `content` の実装が回りくどくなっている
 
 ```rust
 pub fn content(&self) -> &str {
     self.state.as_ref().unwrap().content(&self)
 }
 ```
-@[2](借用しているOption&lt;Box&lt;dyn State&gt;&gt;からBox&lt;dyn State&gt;を借用しなおしてから、State の contentを呼ぶ)
+@[2](借用している Option&lt;Box&lt;dyn State&gt;&gt; から Box&lt;dyn State&gt; を借用しなおしてから、State の content を呼ぶ)
 
 ---
 #### メソッドの引数問題
@@ -383,7 +385,7 @@ pub trait State {
 ```
 
 ---
-#### `self`引数に渡されるのは Box&lt;dyn State&gt;ではない
+#### `self` 引数に渡されるのは Box&lt;dyn State&gt; ではない
 
 試しに、`fn approve(self) -> Box<dyn State>`と宣言を変えてみる。
 
@@ -403,8 +405,8 @@ pub fn approve(&mut self) {
     }
 }
 ```
-@[2](ここで得られる state は`Option`を剥がされた `Box<dyn State>`)
-@[3](この approve の引数が self だと、自動的にBoxが指す先がselfに渡る)
+@[2](ここで得られる state は `Option` を剥がされた `Box<dyn State>`)
+@[3](この approve の引数が self だと、自動的に Box が指す先が self に渡る)
 
 ---
 #### 引数の指定による解決
@@ -427,6 +429,30 @@ pub fn approve(&mut self) {
 ```
 
 ここで `approve` に `Box<Draft>` をそのまま渡せる。
+
+---
+#### 悪あがき
+
+```rust
+impl State for Draft {
+    fn approve(self) -> Box<dyn State> {
+        Box::new(self)
+    }
+    //...
+}
+```
+
+これではイカンのか？
+
+`self` に `Draft` のような具体的な型の値がわたって来るなら、もう一度 `Box::new` で包んだらええんやろ！
+
+---
+#### 浅はか！
+
+![Compile Error](assets/images/compile_error05.png)
+
+呼び出し側で `approve` に渡されるときの型は `Box<dyn State>` を deref された `dyn State` である、と判断され、これはサイズ未定でコンパイルできない。
+
 
 ---
 #### コードの重複を除きたい
