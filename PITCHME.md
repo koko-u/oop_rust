@@ -406,7 +406,8 @@ pub fn approve(&mut self) {
 }
 ```
 @[2](ここで得られる state は `Option` を剥がされた `Box<dyn State>`)
-@[3](この approve の引数が self だと、自動的に Box が指す先が self に渡る)
+@[3](`approve` 呼び出しで `State` を実装している `Draft` 等の `approve` が呼ばれる)
+@[4](`Draft` の `approve` の引数が `self` => `Draft` が渡されている)
 
 ---
 #### 引数の指定による解決
@@ -428,7 +429,7 @@ pub fn approve(&mut self) {
 }
 ```
 
-ここで `approve` に `Box<Draft>` をそのまま渡せる。
+`state: Box<dyn State>` に対して `state.approve()` が参照外しをすることなくそのまま渡せる。
 
 ---
 #### 悪あがき
