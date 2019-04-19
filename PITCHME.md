@@ -345,7 +345,7 @@ pub fn approve(&mut self) {
 
 `Post` が所有している `state` を一瞬足りとも `move` することはできない！
 
-@size[smaller](画像のメソッドがあっていないが、差し替える余力がなかった...)
+@css[text-gray span-60 fragment](画像のメソッドがあっていないが、差し替える余力がなかった...)
 
 ---
 #### Option::take のチカラ
