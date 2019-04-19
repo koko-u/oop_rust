@@ -473,15 +473,29 @@ pub trait State {
 
 ![Compile Error](assets/images/compile_error04.png)
 
-@snap[midpoint text-20 text-white fragment]
-わかりません
+@snap[fragment]
+self のサイズがわからん？？？
 @snapend
 
 ---
-### わかりません
+#### オブジェクト安全ではない！
 <hr/>
 
 @quote[This would violate object safety, because the trait doesn't know what the concreate `self` will be exactly.]
+
+---
+#### わかりません
+
+```rust
+pub trait State {
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+    //...
+}
+```
+
+宣言だけの時は OK で、実装込みになると NG になる不思議。
 
 ---
 ### トレイトオブジェクトによる実装の欠点
